@@ -4,14 +4,20 @@ import { auth } from "../../firebase/firebase.init";
 
 const Register = () => {
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false)
   const handleRegister = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
     console.log("Resister click!", email, password);
+    // reset error
+    setError("")
+    setSuccess(false)
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log("After creation of a new user", result.user);
+        setSuccess(true)
+        e.target.reset();
       })
       .catch((error) => {
         console.log("error happend", error.message);
@@ -48,6 +54,7 @@ const Register = () => {
                   </div>
                   <button className="btn btn-neutral mt-4">Register</button>
                 </fieldset>
+                {success && <p className="text-green-500">Account created successfully</p>}
                 {error && <p className="text-red-500">{error}</p>}
               </form>
             </div>
