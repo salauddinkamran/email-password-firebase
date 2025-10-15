@@ -1,28 +1,67 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { auth } from "../../firebase/firebase.init";
+import { FaRegEye } from "react-icons/fa";
+import { FaRegEyeSlash } from "react-icons/fa";
+import { Link } from "react-router";
 
 const Register = () => {
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const handleRegister = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
-    console.log("Resister click!", email, password);
+    const terms = e.target.terms.checked;
+    console.log("Resister click!", email, password, terms);
+    // const length6Pattern = /^.{6,}$/;
+    // const casePattern = /^(?=.*[a-z])(?=.*[A-Z]).+$/;
+    // const specialCharPattern = /^(?=.*[!@#$%^&*(),.?":{}|<>]).+$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+    // if (!length6Pattern.test(password)) {
+    //   console.log("password didnt match")
+    //   setError("Password must be 6 character or longer")
+    //   return;
+    // } else if (!casePattern.test(password)) {
+    //   setError("Password must have at least one uppercase and one lowercase character.")
+    //   return;
+    // } else if (!specialCharPattern.test(password)) {
+    //   setError("Password must include at least one special character (e.g., !@#$%^&*).")
+    //   return;
+    // }
+
+    if (!passwordRegex.test(password)) {
+      setError(
+        "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, and one special character."
+      );
+      return;
+    }
+
     // reset error
-    setError("")
-    setSuccess(false)
+    setError("");
+    setSuccess(false);
+
+    if (!terms) {
+      setError("Please accept our terms and conditions");
+      return;
+    }
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log("After creation of a new user", result.user);
-        setSuccess(true)
+        setSuccess(true);
         e.target.reset();
       })
       .catch((error) => {
         console.log("error happend", error.message);
         setError(error.message);
       });
+  };
+
+  const handleTogglePasswordShow = (e) => {
+    e.preventDefault();
+    setShowPassword(!showPassword);
   };
   return (
     <div>
@@ -43,20 +82,46 @@ const Register = () => {
                     placeholder="Email"
                   />
                   <label className="label">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    className="input"
-                    placeholder="Password"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      className="input"
+                      placeholder="Password"
+                    />
+                    <button
+                      onClick={handleTogglePasswordShow}
+                      className="btn btn-xs top-2 right-5 absolute"
+                    >
+                      {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
+                    </button>
+                  </div>
+                  <div>
+                    <label className="label">
+                      <input
+                        type="checkbox"
+                        name="terms"
+                        className="checkbox"
+                      />
+                      Accept Our Terms and Condition
+                    </label>
+                  </div>
                   <div>
                     <a className="link link-hover">Forgot password?</a>
                   </div>
                   <button className="btn btn-neutral mt-4">Register</button>
                 </fieldset>
-                {success && <p className="text-green-500">Account created successfully</p>}
+                {success && (
+                  <p className="text-green-500">Account created successfully</p>
+                )}
                 {error && <p className="text-red-500">{error}</p>}
               </form>
+              <p>
+                Already have an account? Please{" "}
+                <Link to="/login" className="text-blue-600 underline">
+                  Login
+                </Link>
+              </p>
             </div>
           </div>
         </div>
