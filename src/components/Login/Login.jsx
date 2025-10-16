@@ -1,12 +1,21 @@
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React from "react";
 import { Link } from "react-router";
+import { auth } from "../../firebase/firebase.init";
 
 const Login = () => {
   const handleLoginForm = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
-    console.log(email, password)
+    console.log(email, password);
+    signInWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
   return (
     <div>
@@ -16,9 +25,19 @@ const Login = () => {
           <form onSubmit={handleLoginForm}>
             <fieldset className="fieldset">
               <label className="label">Email</label>
-              <input type="email" name="email" className="input" placeholder="Email" />
+              <input
+                type="email"
+                name="email"
+                className="input"
+                placeholder="Email"
+              />
               <label className="label">Password</label>
-              <input type="password" name="password" className="input" placeholder="Password" />
+              <input
+                type="password"
+                name="password"
+                className="input"
+                placeholder="Password"
+              />
               <div>
                 <a className="link link-hover">Forgot password?</a>
               </div>
@@ -28,7 +47,7 @@ const Login = () => {
           <p>
             New to our Website? Please
             <Link to="/register" className="text-blue-600 underline ml-1">
-               Register
+              Register
             </Link>
           </p>
         </div>
