@@ -1,22 +1,28 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
 import { auth } from "../../firebase/firebase.init";
 
 const Login = () => {
+  const [error, setError] = useState('')
   const handleLoginForm = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
     console.log(email, password);
+    setError("")
     signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log(result.user);
+        if (!result.user.emailVerified) {
+          alert('Please verify your email address')
+        }
       })
       .catch((error) => {
-        console.log(error.message);
+        setError(error.message)
       });
   };
+  
   return (
     <div>
       <div className="card bg-base-100 w-full m-auto max-w-sm shrink-0 shadow-2xl">
@@ -44,6 +50,7 @@ const Login = () => {
               <button className="btn btn-neutral mt-4">Login</button>
             </fieldset>
           </form>
+          {error && (<p className="text-red-500">{error}</p>)}
           <p>
             New to our Website? Please
             <Link to="/register" className="text-blue-600 underline ml-1">
